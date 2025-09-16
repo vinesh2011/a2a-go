@@ -77,3 +77,43 @@ The `a2a-go` SDK is designed to be transport-agnostic. To add a new transport pr
 3. **Create a new factory function for your transport.** This function will be used to create a new instance of your transport.
 
 For an example of how to implement a transport, see the gRPC implementation in the `a2aclient` and `a2asrv` packages.
+
+## Diagrams
+
+Here are some diagrams to help you understand the architecture of the `a2a-go` project.
+
+### A2A Interaction Sequence Diagram
+
+This diagram shows a typical sequence of events for an A2A interaction.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant A2A Server (gRPC)
+    participant AgentExecutor
+
+    Client->>A2A Server (gRPC): SendMessage(message)
+    A2A Server (gRPC)->>A2A Server (gRPC): Create RequestContext
+    A2A Server (gRPC)->>A2A Server (gRPC): Create EventQueue
+    A2A Server (gRPC)->>AgentExecutor: Execute(context, reqCtx, queue)
+    AgentExecutor->>AgentExecutor: Process message
+    AgentExecutor->>A2A Server (gRPC): queue.Publish(event)
+    A2A Server (gRPC)-->>Client: Stream of events
+```
+
+### Server-side Request Handling Flow
+
+This diagram shows the flow of control when a request is handled by the server.
+
+```mermaid
+graph TD
+    A[gRPC Request] --> B{a2asrv.Handler};
+    B --> C{Authenticate Request};
+    C --> D[Create RequestContext];
+    D --> E[Create EventQueue];
+    E --> F[Call AgentExecutor];
+    F --> G[Agent Business Logic];
+    G --> H[Publish Events];
+    H --> I[Send Response];
+    I --> J[gRPC Response];
+```
