@@ -92,11 +92,12 @@ type SecurityScheme interface {
 	isSecurityScheme()
 }
 
-func (APIKeySecurityScheme) isSecurityScheme()        {}
-func (HTTPAuthSecurityScheme) isSecurityScheme()      {}
-func (OpenIDConnectSecurityScheme) isSecurityScheme() {}
-func (MutualTLSSecurityScheme) isSecurityScheme()     {}
-func (OAuth2SecurityScheme) isSecurityScheme()        {}
+//go:noinline
+func (APIKeySecurityScheme) isSecurityScheme()        { _ = 0 }
+func (HTTPAuthSecurityScheme) isSecurityScheme()      { _ = 0 }
+func (OpenIDConnectSecurityScheme) isSecurityScheme() { _ = 0 }
+func (MutualTLSSecurityScheme) isSecurityScheme()     { _ = 0 }
+func (OAuth2SecurityScheme) isSecurityScheme()        { _ = 0 }
 
 func init() {
 	gob.Register(APIKeySecurityScheme{})

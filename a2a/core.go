@@ -28,18 +28,18 @@ type SendMessageResult interface {
 	isSendMessageResult()
 }
 
-func (*Task) isSendMessageResult()    {}
-func (*Message) isSendMessageResult() {}
+func (*Task) isSendMessageResult()    { _ = 0 }
+func (*Message) isSendMessageResult() { _ = 0 }
 
 // Event interface is used to represent types that can be sent over a streaming connection.
 type Event interface {
 	isEvent()
 }
 
-func (*Message) isEvent()                 {}
-func (*Task) isEvent()                    {}
-func (*TaskStatusUpdateEvent) isEvent()   {}
-func (*TaskArtifactUpdateEvent) isEvent() {}
+func (*Message) isEvent()                 { _ = 0 }
+func (*Task) isEvent()                    { _ = 0 }
+func (*TaskStatusUpdateEvent) isEvent()   { _ = 0 }
+func (*TaskArtifactUpdateEvent) isEvent() { _ = 0 }
 
 // MessageRole represents a set of possible values that identify the message sender.
 type MessageRole string
@@ -341,9 +341,9 @@ type Part interface {
 	Meta() map[string]any
 }
 
-func (TextPart) isPart() {}
-func (FilePart) isPart() {}
-func (DataPart) isPart() {}
+func (TextPart) isPart() { _ = 0 }
+func (FilePart) isPart() { _ = 0 }
+func (DataPart) isPart() { _ = 0 }
 
 func init() {
 	gob.Register(TextPart{})
@@ -454,8 +454,8 @@ func (p *FilePart) UnmarshalJSON(b []byte) error {
 // FilePartContent is a discriminated union of possible file part payloads.
 type FilePartContent interface{ isFilePartContent() }
 
-func (FileBytes) isFilePartContent() {}
-func (FileURI) isFilePartContent()   {}
+func (FileBytes) isFilePartContent() { _ = 0 }
+func (FileURI) isFilePartContent()   { _ = 0 }
 
 func init() {
 	gob.Register(FileBytes{})
