@@ -83,12 +83,73 @@ func TestFilePartJSONDecodingFailure(t *testing.T) {
 		`{"kind":"file","file":{}}`,
 		`{"kind":"file","file":{"name":"foo","mimeType":"mime","uri":"uri","bytes":"abc"}}`,
 		`{"kind":"file","file":{"name":"foo","mimeType":"mime"}}`,
+		`not-a-json`,
 	}
 	for _, v := range malformed {
 		got := FilePart{}
 		if err := json.Unmarshal([]byte(v), &got); err == nil {
 			t.Fatalf("Unmarshal() expected to fail for %s, got: %v", v, got)
 		}
+	}
+}
+
+func TestUnmarshalFailure(t *testing.T) {
+	testCases := []struct {
+		name      string
+		target    any
+		malformed []string
+	}{
+		{
+			name:   "NamedSecuritySchemes",
+			target: &NamedSecuritySchemes{},
+			malformed: []string{
+				`{"name1": "not-an-object"}`,
+				`{"name1": {"type": "invalid-type"}}`,
+				`{"name1": {"type": "apiKey", "name": 123}}`,
+				`{"name1": {"type": "http", "scheme": 123}}`,
+				`{"name1": {"type": "mutualTLS", "description": 123}}`,
+				`{"name1": {"type": "oauth2", "flows": "not-an-object"}}`,
+				`{"name1": {"type": "openIdConnect", "openIdConnectUrl": 123}}`,
+			},
+		},
+		{
+			name:   "ContentParts",
+			target: &ContentParts{},
+			malformed: []string{
+				`["not-an-object"]`,
+				`[{"kind": "invalid-kind"}]`,
+				`[{"kind": "text", "text": {}}]`,
+				`[{"kind": "data", "data": "not-a-map"}]`,
+				`[{"kind": "file", "file": "not-an-object"}]`,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, v := range tc.malformed {
+				err := json.Unmarshal([]byte(v), tc.target)
+				if err == nil {
+					t.Fatalf("Unmarshal() expected to fail for %s", v)
+				}
+			}
+		})
+	}
+}
+
+func TestNamedSecuritySchemes_UnmarshalJSON_Error(t *testing.T) {
+	var s NamedSecuritySchemes
+	err := json.Unmarshal([]byte("not-a-json"), &s)
+	if err == nil {
+		t.Fatal("expected an error")
+	}
+}
+
+func TestContentParts_UnmarshalJSON_Error(t *testing.T) {
+	var p ContentParts
+	err := json.Unmarshal([]byte("not-a-json"), &p)
+	if err == nil {
+		t.Fatal("expected an error")
 	}
 }
 

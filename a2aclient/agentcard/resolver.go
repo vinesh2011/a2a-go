@@ -39,7 +39,10 @@ type resolveRequest struct {
 // Resolve fetches an AgentCard from the provided URL.
 // By default fetches from the  /.well-known/agent-card.json path.
 func (r *Resolver) Resolve(ctx context.Context, opts ...ResolveOption) (*a2a.AgentCard, error) {
-	req := &resolveRequest{path: defaultAgentCardPath}
+	req := &resolveRequest{
+		path:    defaultAgentCardPath,
+		headers: make(map[string]string),
+	}
 	for _, o := range opts {
 		o(req)
 	}
